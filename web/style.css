@@ -99,6 +99,45 @@ html, body {
 .method-list li .m-sig { color: var(--muted); font-size: 11px; display: block; }
 .empty-hint { color: var(--muted); padding: 6px 8px; }
 
+/* ---------- upload panel ---------- */
+.upload-box { padding: 0 14px 8px; display: flex; flex-direction: column; gap: 6px; }
+.upload-box textarea {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 8px;
+}
+.upload-box textarea:focus { outline: none; border-color: var(--accent); }
+.upload-row { display: flex; gap: 6px; }
+.file-btn, .upload-btn {
+  flex: 1;
+  text-align: center;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 5px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+.file-btn:hover, .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+.upload-status {
+  font-size: 11px;
+  color: var(--muted);
+  min-height: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.upload-status.error { color: var(--cat-branch); }
+.upload-status.ok { color: var(--cat-stack); }
+
 /* ---------- main table ---------- */
 .main { display: flex; flex-direction: column; overflow: hidden; }
 

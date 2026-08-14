@@ -37,6 +37,7 @@ public class WebServer {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/api/classes", this::handleListClasses);
         server.createContext("/api/analyze", this::handleAnalyze);
+        server.createContext("/api/upload", this::handleUpload);
         server.createContext("/", this::handleStatic);
         server.setExecutor(null);
         server.start();
@@ -75,6 +76,54 @@ public class WebServer {
         try {
             String json = Analyzer.analyzeToJson(target.getPath());
             sendJson(ex, 200, json);
+        } catch (Exception e) {
+            sendJson(ex, 500, "{\"error\":" + Json.str(String.valueOf(e.getMessage())) + "}");
+        }
+    }
+
+    private void handleUpload(HttpExchange ex) throws IOException {
+        if (!"POST".equals(ex.getRequestMethod())) {
+            sendJson(ex, 405, "{\"error\":\"use POST\"}");
+            return;
+        }
+
+        // Read the raw request body (frontend sends the file's plain text content).
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try (InputStream is = ex.getRequestBody()) {
+            is.transferTo(buffer);
+        }
+        String source = buffer.toString(StandardCharsets.UTF_8);
+
+        final int MAX_SOURCE_BYTES = 200_000; // generous for a single class, prevents abuse
+        if (source.isBlank()) {
+            sendJson(ex, 400, "{\"error\":\"empty file\"}");
+            return;
+        }
+        if (buffer.size() > MAX_SOURCE_BYTES) {
+            sendJson(ex, 400, "{\"error\":\"file too large (max 200KB)\"}");
+            return;
+        }
+
+        // Derive the public class name from the source itself - javac requires
+        // the filename to match the public class name exactly, so we don't trust
+        // whatever filename the browser sent.
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("(?:public\\s+)?class\\s+([A-Za-z_$][A-Za-z0-9_$]*)")
+                .matcher(source);
+        if (!m.find()) {
+            sendJson(ex, 400, "{\"error\":\"couldn't find a class declaration in this file\"}");
+            return;
+        }
+        String className = m.group(1);
+
+        try {
+            UploadCompiler.CompileResult result = UploadCompiler.compile(classesDir, className, source);
+            if (!result.success) {
+                Map<String, String> err = new HashMap<>();
+                sendJson(ex, 422, "{\"error\":" + Json.str("Compilation failed:\n" + result.message) + "}");
+                return;
+            }
+            sendJson(ex, 200, "{\"success\":true,\"className\":" + Json.str(className + ".class") + "}");
         } catch (Exception e) {
             sendJson(ex, 500, "{\"error\":" + Json.str(String.valueOf(e.getMessage())) + "}");
         }

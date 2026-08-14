@@ -165,3 +165,44 @@ function escapeHtml(s) {
 }
 
 loadClasses();
+
+// ---------- upload / paste code ----------
+document.getElementById('fileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  document.getElementById('codeInput').value = text;
+});
+
+document.getElementById('analyzeBtn').addEventListener('click', async () => {
+  const source = document.getElementById('codeInput').value;
+  const status = document.getElementById('uploadStatus');
+  if (!source.trim()) {
+    status.textContent = 'paste or choose a .java file first';
+    status.className = 'upload-status error';
+    return;
+  }
+  status.textContent = 'compiling…';
+  status.className = 'upload-status';
+
+  try {
+    const res = await fetch('/api/upload', { method: 'POST', body: source });
+    const data = await res.json();
+    if (!res.ok) {
+      status.textContent = data.error || 'compile failed';
+      status.className = 'upload-status error';
+      return;
+    }
+    status.textContent = 'compiled ' + data.className + ' ✓';
+    status.className = 'upload-status ok';
+    await loadClasses();
+    // auto-select the newly uploaded class
+    const items = document.querySelectorAll('#classList li');
+    for (const li of items) {
+      if (li.textContent === data.className) { li.click(); break; }
+    }
+  } catch (err) {
+    status.textContent = 'network error: ' + err.message;
+    status.className = 'upload-status error';
+  }
+});

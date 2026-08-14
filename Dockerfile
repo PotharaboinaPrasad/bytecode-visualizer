@@ -10,8 +10,9 @@ RUN CP="lib/asm-9.7.jar:lib/asm-tree-9.7.jar:lib/asm-util-9.7.jar:lib/asm-analys
     javac -cp "$CP" -d out src/com/prasad/bcviz/*.java && \
     javac -d samples --release 21 samples/Sample.java
 
-# Runtime stage: smaller image, only what's needed to run
-FROM eclipse-temurin:21-jre
+# Runtime stage: needs a full JDK (not JRE) because the upload feature
+# compiles user-submitted .java source in-process via javax.tools.JavaCompiler
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=build /app/out out/
 COPY --from=build /app/lib lib/

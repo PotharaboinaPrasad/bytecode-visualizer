@@ -23,6 +23,19 @@
     <div class="panel-label">classes</div>
     <ul id="classList" class="class-list"></ul>
 
+    <div class="panel-label">upload / paste code</div>
+    <div class="upload-box">
+      <textarea id="codeInput" placeholder="public class MyClass {&#10;    // paste a single-class .java file here&#10;}"></textarea>
+      <div class="upload-row">
+        <label class="file-btn">
+          choose .java file
+          <input type="file" id="fileInput" accept=".java" hidden>
+        </label>
+        <button id="analyzeBtn" class="upload-btn">analyze</button>
+      </div>
+      <div class="upload-status" id="uploadStatus"></div>
+    </div>
+
     <div class="panel-label">methods</div>
     <ul id="methodList" class="method-list">
       <li class="empty-hint">select a class</li>
