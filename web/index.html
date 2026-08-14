@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bcviz — Java Bytecode Visualizer</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-glyph">{ }</span>
+    <span class="brand-name">bcviz</span>
+    <span class="brand-tag">bytecode visualizer</span>
+  </div>
+  <div class="topbar-meta" id="classMeta">no class loaded</div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="panel-label">classes</div>
+    <ul id="classList" class="class-list"></ul>
+
+    <div class="panel-label">methods</div>
+    <ul id="methodList" class="method-list">
+      <li class="empty-hint">select a class</li>
+    </ul>
+  </aside>
+
+  <main class="main">
+    <div class="method-header" id="methodHeader">
+      <span class="placeholder">select a method to disassemble it</span>
+    </div>
+
+    <div class="instr-table-wrap">
+      <table class="instr-table" id="instrTable">
+        <thead>
+          <tr>
+            <th class="col-idx">#</th>
+            <th class="col-line">line</th>
+            <th class="col-op">opcode</th>
+            <th class="col-operand">operand</th>
+            <th class="col-note">effect</th>
+          </tr>
+        </thead>
+        <tbody id="instrBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <aside class="stack-panel">
+    <div class="panel-label">operand stack <span id="stepIndicator"></span></div>
+    <div class="stack-visual" id="stackVisual">
+      <div class="stack-floor">stack base</div>
+    </div>
+    <div class="panel-label secondary">step</div>
+    <div class="step-controls">
+      <button id="prevStep" class="step-btn">&larr; prev</button>
+      <button id="nextStep" class="step-btn">next &rarr;</button>
+    </div>
+    <div class="note-box" id="noteBox">click a row, or step through with the buttons</div>
+  </aside>
+
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
